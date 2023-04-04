@@ -6,7 +6,7 @@
 
 # include "../Client/Client.class.hpp"
 //# include "../Server/Server.class.hpp"
-
+class Client;
 class Server;
 
 class Channel {
@@ -21,15 +21,16 @@ public:
   // Getters
   std::string getName(void) const;
   Client getClient(std::string name);
-  std::vector<Client> & getClients(void);
+  std::vector<Client *> & getClients(void);
   // Checkers
   //bool channelExists(std::string name) const;
   // Setters
-  void addClient(Client const & client);
+  void addClient(Client * client);
+  bool removeClient(Client * client);
   // Utils
 private:
   std::string _name;
-  std::vector<Client> _clientsConnected;
+  std::vector<Client *> _clientsConnected;
 };
 
 std::ostream & operator<<(std::ostream & o, Channel const & i);

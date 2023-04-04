@@ -3,6 +3,10 @@
 
 #include <string>
 #include <iostream>
+#include "../Channel/Channel.class.hpp"
+
+// forward declaration
+class Channel;
 
 class Client {
 public:
@@ -18,10 +22,12 @@ public:
   std::string getNickname(void) const;
   int getSocket(void) const;
   std::string getIP(void) const;
+  std::string getIdentifier(void) const;
 
   // Checkers
   bool isRegistered(void) const;
   bool passwordIsSet(void) const;
+  bool isInChannel(Channel * channel) const;
 
   // Setters
   void setNickname(std::string nickname);
@@ -30,6 +36,9 @@ public:
   void setRegistered(void);
   void setUsername(std::string username);
   void setIP(std::string ip);
+  void setFullIdentifier(void);
+  void joinChannel(Channel * channel);
+  void quitChannel(Channel * channel);
 private:
   int _socket;
   std::string _nickname;
@@ -37,8 +46,10 @@ private:
   std::string _password;
   std::string _realname;
   std::string _ip;
+  std::string _fullIdentifier;
   bool _operator;
   bool _isRegistered;
+  std::vector<Channel *> _channelsJoined;
 };
 
 std::ostream & operator<<(std::ostream & o, Client const & i);

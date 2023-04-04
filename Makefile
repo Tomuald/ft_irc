@@ -12,6 +12,7 @@ SRCS	=	Server/Server.class.cpp		\
 			Server/Commands/privmsg.cpp	\
 			Server/Commands/pong.cpp	\
 			Server/Commands/who.cpp		\
+			Server/Commands/part.cpp	\
 			response.cpp				\
 
 OBJS	=	${SRCS:.cpp=.o}
