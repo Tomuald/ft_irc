@@ -12,9 +12,10 @@ std::string Server::privmsg(Client * client, Message & msg) {
   params.push_back(msg.params[0]);
   response = generateResponse(client->getIdentifier(), "", params, msg.params[1]);
   std::cout << response << std::endl;
-  if (msg.params[0][0] == '#') {
+  std::string channel_type = "#!&*";
+  if (channel_type.find(msg.params[0][0]) != std::string::npos) {
     if (this->channelExists(msg.params[0])) {
-    // send to channel
+      // get channel
       Channel * channel = this->getChannel(msg.params[0]);
       if (client->isInChannel(channel) == false) {
         params.clear();
@@ -22,6 +23,7 @@ std::string Server::privmsg(Client * client, Message & msg) {
         response = generateResponse("ft_irc", "404", params, "You are not on this channel");
         return (response);
       }
+      // send to channel
       std::vector<Client *>::iterator it;
       std::vector<Client *> clients = channel->getClients();
       std::cout << "Clients in channel: " << clients.size() << std::endl;

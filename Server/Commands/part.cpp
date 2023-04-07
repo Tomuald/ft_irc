@@ -18,11 +18,12 @@ std::string Server::part(Client * client, Message & msg) {
     params.push_back(msg.params[0]);
     return (generateResponse(client->getIdentifier(), "442", params, "You're not on that channel"));
   }
-  // if (channel->getClients().size() == 0) {
-  //   this->removeChannel(channel);
-  //   params.push_back(channel->getName());
-  //   return (generateResponse("ft_irc", "404", params, "No more users in channel"));
-  // }
+  if (channel->getClients().size() == 0) {
+    this->removeChannel(channel);
+    params.push_back(channel->getName());
+    response = generateResponse("ft_irc", "404", params, "No more users in channel");
+    send(client->getSocket(), response.c_str(), response.length(), 0);
+  }
   std::cout << "Num of channels: " << this->_channels.size() << std::endl;
   params.push_back(msg.params[0]);
   std::string message;

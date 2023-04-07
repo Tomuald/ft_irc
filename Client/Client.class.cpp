@@ -57,6 +57,14 @@ std::string Client::getIdentifier(void) const {
   return (this->_fullIdentifier);
 }
 
+std::string Client::getIP(void) const {
+  return (this->_ip);
+}
+
+std::string Client::getMode(void) const {
+  return (this->_mode);
+}
+
 // Checkers
 bool Client::isRegistered(void) const {
   return (this->_isRegistered);
@@ -69,9 +77,6 @@ bool Client::passwordIsSet(void) const {
   return (true);
 }
 
-std::string Client::getIP(void) const {
-  return (this->_ip);
-}
 
 bool Client::isInChannel(Channel * channel) const {
   std::vector<Channel *>::const_iterator it = this->_channelsJoined.begin();
@@ -131,11 +136,16 @@ void Client::setIP(std::string ip) {
 }
 
 void Client::setFullIdentifier(void) {
-  this->_fullIdentifier += this->_nickname;
-  this->_fullIdentifier += "!";
-  this->_fullIdentifier += this->_username;
-  this->_fullIdentifier += "@";
-  this->_fullIdentifier += this->_ip;
+  this->_fullIdentifier.erase();
+  this->_fullIdentifier.append(this->_nickname);
+  this->_fullIdentifier.append("!");
+  this->_fullIdentifier.append(this->_username);
+  this->_fullIdentifier.append("@");
+  this->_fullIdentifier.append(this->_ip);
+}
+
+void Client::setMode(std::string mode) {
+  this->_mode = mode;
 }
 
 void Client::joinChannel(Channel * channel) {

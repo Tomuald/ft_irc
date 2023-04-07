@@ -49,6 +49,10 @@ Message::Message(const std::string& line) {
       }
     }
   }
+  if (this->command.empty() && !this->params.empty()) {
+    this->command = this->params[0];
+    this->params.erase(this->params.begin());
+  }
 }
 
 std::vector<std::string> & Message::getParams(void) {
@@ -67,7 +71,7 @@ Message & Message::operator=(Message const & rhs) {
 }
 
 std::ostream & operator<<(std::ostream & o, Message const & i) {
-  o << "Print something";
+  o << i.command;
   (void) i;
   return (o);
 }

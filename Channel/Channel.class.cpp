@@ -31,7 +31,8 @@ std::vector<Client *> & Channel::getClients(void) {
 
 // Setters
 void Channel::addClient(Client * client) {
-  this->_clientsConnected.push_back(client);
+  if (!client->isInChannel(this))
+    this->_clientsConnected.push_back(client);
 }
 
 bool Channel::removeClient(Client * client) {

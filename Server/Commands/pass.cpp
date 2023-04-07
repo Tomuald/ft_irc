@@ -11,5 +11,5 @@ std::string Server::pass(Client * client, Message & msg) {
   if (this->_password.compare(msg.params[0]) != 0)
     return (generateResponse("ft_irc", "464",  null_vector,"Password incorrect"));
   client->setPassword(msg.params[0]);
-  return (generateResponse("ft_irc", "376", null_vector, "Password accepted"));
+  return ("");
 }

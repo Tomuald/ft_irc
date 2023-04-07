@@ -26,11 +26,15 @@ std::string Server::join(Client * client, Message & msg) {
   for (it = clients.begin(); it != clients.end(); ++it) {
     send((*it)->getSocket(), response.c_str(), response.length(), 0);
   }
+
+  // Notify the user of the channel details
   params.clear();
   params.push_back(client->getNickname());
   params.push_back(channel_name);
   response = generateResponse("ft_irc", "332", params, "This is a default topic!");
   send(client->getSocket(), response.c_str(), response.length(), 0);
+
+  // Notify the user of other users in the channel
   params.clear();
   params.push_back(client->getNickname());
   params.push_back("=");
@@ -46,6 +50,7 @@ std::string Server::join(Client * client, Message & msg) {
   }
   response = generateResponse("ft_irc", "353", params, nicknames);
   send(client->getSocket(), response.c_str(), response.length(), 0);
+  // Notify End of /NAMES list
   params.clear();
   params.push_back(client->getNickname());
   params.push_back(channel_name);

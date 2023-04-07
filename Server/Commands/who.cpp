@@ -12,8 +12,8 @@ std::string Server::who(Client * client, Message & msg) {
   }
   std::string response = generateResponse("ft_irc", "352", userlist, "");
   send(client->getSocket(), response.c_str(), response.length(), 0);
-  std::vector<std::string> _name;
-  _name.push_back(userlist.back());
-  response = generateResponse("ft_irc", "315", _name, "End of /WHO list");
+  std::vector<std::string> _names;
+  _names.push_back(userlist.back());
+  response = generateResponse("ft_irc", "315", _names, "End of /WHO list");
   return (response);
 }

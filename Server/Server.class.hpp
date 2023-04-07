@@ -35,11 +35,12 @@ class Server {
     ~Server(void);
 
     // Registration
-    void registerClient(int socket, std::vector<Message> messages);
-    bool channelExists(std::string const name) const;
+    void registerClient(Client * client);
 
     // Checkers
+    bool channelExists(std::string const name) const;
     bool clientRegistered(int socket) const;
+    bool informationValid(Client * client) const;
 
     // Getters
     Client * getClientBySocket(int socket);
@@ -48,7 +49,9 @@ class Server {
 
     // Setters
     void addChannel(Channel * channel);
+    void addClient(Client * client);
     void removeChannel(Channel * channel);
+    void removeClient(Client * client);
 
     // Server setup
     int makeServerSocket(void);
@@ -73,6 +76,8 @@ class Server {
     std::string privmsg(Client * client, Message & msg);
     std::string pong(Client * client, Message & msg);
     std::string who(Client * client, Message & msg);
+    std::string mode(Client * client, Message & msg);
+    std::string die(Client * client, Message & msg);
 
     // Overloads
     Server & operator=(Server const & rhs);

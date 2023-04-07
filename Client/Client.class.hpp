@@ -23,6 +23,7 @@ public:
   int getSocket(void) const;
   std::string getIP(void) const;
   std::string getIdentifier(void) const;
+  std::string getMode(void) const;
 
   // Checkers
   bool isRegistered(void) const;
@@ -37,6 +38,7 @@ public:
   void setUsername(std::string username);
   void setIP(std::string ip);
   void setFullIdentifier(void);
+  void setMode(std::string mode);
   void joinChannel(Channel * channel);
   void quitChannel(Channel * channel);
 private:
@@ -47,6 +49,7 @@ private:
   std::string _realname;
   std::string _ip;
   std::string _fullIdentifier;
+  std::string _mode;
   bool _operator;
   bool _isRegistered;
   std::vector<Channel *> _channelsJoined;
