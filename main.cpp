@@ -6,7 +6,6 @@ int main(int argc, char **argv) {
     std::cerr << "usage: ./ircserv <port> <password>" << std::endl;
     return (-1);
   }
-  (void) argv;
   std::cout << "Program Starting" << std::endl;
   Server server(argv[1], argv[2]);
   try {

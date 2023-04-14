@@ -25,56 +25,58 @@ Server::~Server(void) {return;}
 // Registration
 ///////////////
 
-void Server::registerClient(int socket, std::vector<Message> messages) {
-  Client new_client(socket);
-  bool pass_found = false;
-  std::vector<std::string> null_vector(0);
-
-  std::cout << "Registering" << std::endl;
-  std::vector<Message>::iterator it;
-  for (it = messages.begin(); it != messages.end(); ++it) {
-     if (it->command == "PASS") {
-       std::string response = this->pass(new_client, (*it));
-       pass_found = true;
-       send(socket, response.c_str(), response.length(), 0);
-      }
-     else if (it->command == "NICK") {
-       std::string response = this->nick(new_client, (*it));
-       send(socket, response.c_str(), response.length(), 0);
-     } else if (it->command == "USER") {
-      std::string response = this->user(new_client, (*it));
-      send(socket, response.c_str(), response.length(), 0);
-    }
-  }
-  if (pass_found == false) {
-    std::string response = generateResponse("ft_irc", "464", null_vector, "Password incorrect");
-    send(socket, response.c_str(), response.length(), 0);
-    return ;
-  }
-  if (!new_client.getUsername().empty() && \
-      !new_client.getNickname().empty() && \
-      new_client.passwordIsSet() == true) {
-    std::string response = generateResponse("ft_irc", "001",  null_vector, "Welcome " + new_client.getNickname());
-    send(socket, response.c_str(), response.length(), 0);
-    this->_userbase.push_back(new_client);
-    new_client.setRegistered();
-    std::cout << "client socket: " << new_client.getSocket() << std::endl;
+void Server::registerClient(Client * client) {
+  if (this->informationValid(client)) {
+    std::vector<std::string> params;
+    params.push_back(client->getNickname());
+    client->setRegistered();
+    this->addClient(client);
+    std::string welcome = "Welcome to ft_irc " + client->getIdentifier();
+    std::string response = generateResponse("ft_irc", "001",  params, welcome);
+    send(client->getSocket(), response.c_str(), response.length(), 0);
   } else {
+    std::vector<std::string> null_vector(0);
     std::string response = generateResponse("ft_irc", "464", null_vector, "Registration failed");
-    send(socket, response.c_str(), response.length(), 0);
+    send(client->getSocket(), response.c_str(), response.length(), 0);
+    Message msg;
+    this->quit(client, msg);
+    //this->removeClient(client);
   }
-  std::cout << "userbase: " << this->_userbase.size() << std::endl;
   return ;
 }
 
+///////////
+// Setters
+///////////
+
+void Server::addChannel(Channel * channel) {
+  this->_channels.push_back(channel);
+}
+
+void Server::addClient(Client * client) {
+  this->_userbase.push_back(client);
+}
+
+void Server::removeClient(Client * client) {
+  std::vector<Client *>::iterator it = this->_userbase.begin();
+  while (it != this->_userbase.end()) {
+    if ((*it)->getSocket() == client->getSocket()) {
+      it = this->_userbase.erase(it);
+      delete *it;
+    } else {
+      it++;
+    }
+  }
+}
 ///////////
 // Checkers
 ///////////
 
 bool Server::channelExists(std::string const name) const {
-  std::vector<Channel>::const_iterator it;
+  std::vector<Channel *>::const_iterator it;
   for (it = this->_channels.begin(); it != this->_channels.end(); ++it) {
-    if (it->getName() == name) {
+    std::cout << "Channel name: " << (*it)->getName() << std::endl;
+    if ((*it)->getName() == name) {
       return (true);
     }
   }
@@ -82,12 +84,21 @@ bool Server::channelExists(std::string const name) const {
 }
 
 bool Server::clientRegistered(int socket) const {
-  std::vector<Client>::const_iterator it = this->_userbase.begin();
+  std::vector<Client *>::const_iterator it = this->_userbase.begin();
   for (it = this->_userbase.begin(); it != this->_userbase.end(); ++it) {
-    const Client & obj = *it;
-    if (obj.getSocket() == socket) {
+    const Client * obj = *it;
+    if (obj->getSocket() == socket) {
       return (true);
     }
+  }
+  return (false);
+}
+
+bool Server::informationValid(Client * client) const {
+  if (!client->getUsername().empty() && \
+      !client->getNickname().empty() && \
+      client->passwordIsSet() == true) {
+    return (true);
   }
   return (false);
 }
@@ -96,43 +107,55 @@ bool Server::clientRegistered(int socket) const {
 // Getters
 //////////
 
-Client & Server::getClientBySocket(int socket) {
-  std::vector<Client>::iterator it = this->_userbase.begin();
+Client * Server::getClientBySocket(int socket) {
+  std::vector<Client *>::iterator it = this->_userbase.begin();
   for (it = this->_userbase.begin(); it != this->_userbase.end(); ++it) {
-    Client & obj = *it;
-    if (obj.getSocket() == socket) {
+    Client * obj = *it;
+    if (obj->getSocket() == socket) {
       return (obj);
     }
   }
   // return a null object if not found
-  static Client null_client;
-  return (null_client);
+  return (nullptr);
 }
 
-Client & Server::getClientByName(std::string name) {
-  std::vector<Client>::iterator it = this->_userbase.begin();
+Client * Server::getClientByName(std::string name) {
+  std::vector<Client *>::iterator it = this->_userbase.begin();
   for (it = this->_userbase.begin(); it != this->_userbase.end(); ++it) {
-    Client & obj = *it;
-    if (obj.getNickname() == name) {
+    Client * obj = *it;
+    if (obj->getNickname() == name) {
       return (obj);
     }
   }
   // return a null object if not found
-  static Client null_client;
-  return (null_client);
+  return (nullptr);
 }
 
-Channel& Server::getChannel(std::string name) {
-  std::vector<Channel>::iterator it;
+Channel * Server::getChannel(std::string & name) {
+  std::vector<Channel *>::iterator it;
   for (it = this->_channels.begin(); it != this->_channels.end(); ++it) {
-    if (it->getName() == name) {
+    if ((*it)->getName() == name) {
       return (*it);
     }
   }
-  // If the channel doesn't exist, create it and add it to the vector
-  this->_channels.push_back(Channel(name));
-  int index = this->_channels.size() - 1;
-  return this->_channels[index];
+  std::string channel_types = "#!&*";
+  if (channel_types.find(name[0]) == std::string::npos)
+    return (nullptr);
+  Channel * channel = new Channel(name);
+  this->addChannel(channel);
+  return (channel);
+}
+
+void Server::removeChannel(Channel * channel) {
+  std::vector<Channel *>::iterator it = this->_channels.begin() ;
+  while (it != this->_channels.begin()) {
+    if ((*it) == channel) {
+      delete *it;
+      it = this->_channels.erase(it);
+    } else {
+      ++it;
+    }
+  }
 }
 
 ///////////////
@@ -140,11 +163,18 @@ Channel& Server::getChannel(std::string name) {
 ///////////////
 
 int Server::makeServerSocket(void) {
+
   this->_server_socket = socket(AF_INET, SOCK_STREAM, 0);
   if (this->_server_socket == -1) {
     throw std::exception();
   }
   std::cout << "socket created" << std::endl;
+
+  int optval = 1;
+  socklen_t optlen = sizeof(optval);
+  if (setsockopt(this->_server_socket, SOL_SOCKET, SO_REUSEADDR, &optval, optlen) < 0) {
+    return (-1);
+  }
 
   // set up addresses for binding
   struct sockaddr_in addr;
@@ -272,7 +302,7 @@ std::vector<Message> Server::parse(char buffer[1024]) {
 ////////////////////
 // Message execution
 ////////////////////
-std::string Server::execute(Client & client, Message & msg) {
+std::string Server::execute(Client * client, Message & msg) {
   std::map<std::string, fctPointer> functionMap = this->getFunctionMap();
   std::vector<std::string> null_vector(0);
   std::map<std::string, fctPointer>::iterator it;
@@ -288,28 +318,41 @@ std::string Server::execute(Client & client, Message & msg) {
     }
   }
   if (found == false) {
-    return (generateResponse("ft_irc", "421", null_vector, "Unknown command"));
+    null_vector.push_back(client->getIdentifier());
+    null_vector.push_back("Unknown command");
+    return (generateResponse("ft_irc", "421", null_vector, ""));
   }
   return (response);
 }
 
 void Server::handleRequest(int socket, char buffer[1024]) {
   std::cout << buffer << std::endl;
+  Client * client;
+  client = this->getClientBySocket(socket);
 
-  if (this->clientRegistered(socket) == false) {
-    std::vector<Message> messages = this->parse(buffer);
-    this->registerClient(socket, messages);
+  // unelegant fix because NICK arrives before USER therefore, missing
+  // fullIdentifier data to process properly on new connect. Gotta
+  // reverse traverse the buffer
+  std::vector<Message> messages = this->parse(buffer);
+  if (client == nullptr) {
+    client = new Client(socket);
+    std::vector<Message>::reverse_iterator it;
+    for (it = messages.rbegin(); it != messages.rend(); ++it) {
+      std::string response = this->execute(client, (*it));
+      std::cout << response << std::endl;
+      send(socket, response.c_str(), response.length(), 0);
+    }
+    this->registerClient(client);
   } else {
-    // client exists, handle request
-    std::vector<Message> messages = this->parse(buffer);
     std::vector<Message>::iterator it;
     for (it = messages.begin(); it != messages.end(); ++it) {
-      Client client = this->getClientBySocket(socket);
+      std::cout << (*it) << std::endl;
       std::string response = this->execute(client, (*it));
       std::cout << response << std::endl;
       send(socket, response.c_str(), response.length(), 0);
     }
   }
+  std::cout << "Server now has: " << this->_userbase.size() << " users" << std::endl;
 }
 
 // consider building this in your constructors!
@@ -322,6 +365,11 @@ std::map<std::string, Server::fctPointer> Server::getFunctionMap(void) {
   functionMap.insert(make_pair("PRIVMSG", &Server::privmsg));
   functionMap.insert(make_pair("PING", &Server::pong));
   functionMap.insert(make_pair("WHO", &Server::who));
+  functionMap.insert(make_pair("PART", &Server::part));
+  functionMap.insert(make_pair("NICK", &Server::nick));
+  functionMap.insert(make_pair("MODE", &Server::mode));
+  functionMap.insert(make_pair("USER", &Server::user));
+  functionMap.insert(make_pair("die", &Server::die));
   // operator functions
 
   return (functionMap);

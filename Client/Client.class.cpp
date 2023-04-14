@@ -20,6 +20,7 @@ Client::Client(Client const & src) {
   this->_operator = src._operator;
   this->_isRegistered = src._isRegistered;
   this->_ip = src._ip;
+  this->_fullIdentifier = src._fullIdentifier;
   return ;
 }
 
@@ -33,6 +34,7 @@ Client & Client::operator=(Client const & rhs) {
     this->_password = rhs._password;
     this->_operator = rhs._operator;
     this->_isRegistered = rhs._isRegistered;
+    this->_fullIdentifier = rhs._fullIdentifier;
     this->_ip = rhs._ip;
   }
   return (*this);
@@ -51,6 +53,18 @@ int Client::getSocket(void) const {
   return (this->_socket);
 }
 
+std::string Client::getIdentifier(void) const {
+  return (this->_fullIdentifier);
+}
+
+std::string Client::getIP(void) const {
+  return (this->_ip);
+}
+
+std::string Client::getMode(void) const {
+  return (this->_mode);
+}
+
 // Checkers
 bool Client::isRegistered(void) const {
   return (this->_isRegistered);
@@ -63,8 +77,17 @@ bool Client::passwordIsSet(void) const {
   return (true);
 }
 
-std::string Client::getIP(void) const {
-  return (this->_ip);
+
+bool Client::isInChannel(Channel * channel) const {
+  std::vector<Channel *>::const_iterator it = this->_channelsJoined.begin();
+  while (it != this->_channelsJoined.end()) {
+    if ((*it) == channel) {
+      return (true);
+    } else {
+      ++it;
+    }
+  }
+  return (false);
 }
 
 // Setters
@@ -110,6 +133,34 @@ void Client::setRegistered(void) {
 
 void Client::setIP(std::string ip) {
   this->_ip = ip;
+}
+
+void Client::setFullIdentifier(void) {
+  this->_fullIdentifier.erase();
+  this->_fullIdentifier.append(this->_nickname);
+  this->_fullIdentifier.append("!");
+  this->_fullIdentifier.append(this->_username);
+  this->_fullIdentifier.append("@");
+  this->_fullIdentifier.append(this->_ip);
+}
+
+void Client::setMode(std::string mode) {
+  this->_mode = mode;
+}
+
+void Client::joinChannel(Channel * channel) {
+  this->_channelsJoined.push_back(channel);
+}
+
+void Client::quitChannel(Channel * channel) {
+  std::vector<Channel *>::iterator it = this->_channelsJoined.begin();
+  while (it != this->_channelsJoined.end()) {
+    if ((*it) == channel) {
+      it = this->_channelsJoined.erase(it);
+    } else {
+      ++it;
+    }
+  }
 }
 
 std::ostream & operator<<(std::ostream & o, Client const & i) {
