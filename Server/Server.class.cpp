@@ -189,6 +189,10 @@ int Server::setUpKQ(void) {
 
 
 void Server::start(void) {
+  // ensayo leo
+  struct sockaddr_in struct_client;
+  unsigned len = 0;
+
   // init a server socket
   if (this->makeServerSocket() == -1) {
     throw std::exception();
@@ -213,7 +217,7 @@ void Server::start(void) {
       if (socket == this->_server_socket) {
            // new connection
            std::cout << "registering new connection" << std::endl;
-           int accept_socket = accept(this->_server_socket, NULL, NULL);
+           int accept_socket = accept(this->_server_socket, (struct sockaddr *) &struct_client, &len);
            if (accept_socket == -1) {
                std::cerr << strerror(errno) << std::endl;
                continue;
