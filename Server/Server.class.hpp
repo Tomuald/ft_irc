@@ -78,12 +78,17 @@ class Server {
     std::string who(Client * client, Message & msg);
     std::string mode(Client * client, Message & msg);
     std::string die(Client * client, Message & msg);
+    
+    //oper
+    std::string oper(Client * client, Message & msg);
+
 
     // Overloads
     Server & operator=(Server const & rhs);
   private:
     std::string _port;
     std::string _password;
+    std::string _opepass;
     int _server_socket;
     int _kq;
     struct kevent _event;

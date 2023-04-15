@@ -247,7 +247,7 @@ void Server::start(void) {
       if (socket == this->_server_socket) {
            // new connection
            std::cout << "registering new connection" << std::endl;
-           int accept_socket = accept(this->_server_socket, (struct sockaddr *) &struct_client, &len);
+           int accept_socket = accept(this->_server_socket, (struct sockaddr *) &struct_client, &len); //leo
            if (accept_socket == -1) {
                std::cerr << strerror(errno) << std::endl;
                continue;
@@ -326,7 +326,7 @@ std::string Server::execute(Client * client, Message & msg) {
 }
 
 void Server::handleRequest(int socket, char buffer[1024]) {
-  std::cout << buffer << std::endl;
+  std::cout << "buffer = " << buffer << std::endl;
   Client * client;
   client = this->getClientBySocket(socket);
 
@@ -357,6 +357,7 @@ void Server::handleRequest(int socket, char buffer[1024]) {
 
 // consider building this in your constructors!
 std::map<std::string, Server::fctPointer> Server::getFunctionMap(void) {
+
   std::map<std::string, fctPointer> functionMap;
   // basic functions
   functionMap.insert(make_pair("PASS", &Server::pass));
@@ -371,6 +372,7 @@ std::map<std::string, Server::fctPointer> Server::getFunctionMap(void) {
   functionMap.insert(make_pair("USER", &Server::user));
   functionMap.insert(make_pair("die", &Server::die));
   // operator functions
+  functionMap.insert(make_pair("OPER", &Server::oper));
 
   return (functionMap);
 }
