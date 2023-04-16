@@ -27,6 +27,7 @@ public:
   // Setters
   void addClient(Client * client);
   bool removeClient(Client * client);
+  bool checkClientConnected(Client * client);
   // Utils
 private:
   std::string _name;

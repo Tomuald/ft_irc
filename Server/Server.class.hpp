@@ -81,6 +81,7 @@ class Server {
     
     //oper
     std::string oper(Client * client, Message & msg);
+    std::string kick(Client * client, Message & msg);
 
 
     // Overloads

@@ -369,6 +369,7 @@ std::map<std::string, Server::fctPointer> Server::getFunctionMap(void) {
   functionMap.insert(make_pair("die", &Server::die));
   // operator functions
   functionMap.insert(make_pair("OPER", &Server::oper));
+  functionMap.insert(make_pair("KICK", &Server::kick));
 
   return (functionMap);
 }

@@ -48,6 +48,18 @@ bool Channel::removeClient(Client * client) {
   return (false);
 }
 
+bool Channel::checkClientConnected(Client * client) {
+  std::vector<Client *>::iterator it = this->_clientsConnected.begin();
+  while (it != this->_clientsConnected.end()) {
+    if ((*it)->getNickname() == client->getNickname()) {
+      return (true);
+    } else {
+      ++it;
+    }
+  }
+  return (false);
+}
+
 Channel & Channel::operator=(Channel const & rhs) {
   if (this != &rhs) {
     this->_name = rhs._name;
