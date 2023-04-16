@@ -338,23 +338,24 @@ void Server::handleRequest(int socket, char buffer[1024]) {
     client = new Client(socket);
     this->addClient(client);
     std::cout << "client socket = " << socket << std::endl;
-    std::vector<Message>::reverse_iterator it;
-    for (it = messages.rbegin(); it != messages.rend(); ++it) {
-      std::cout << "dentro de for = " << *it << std::endl;
-      std::string response = this->execute(client, (*it));
-      std::cout << response << std::endl;
-      send(socket, response.c_str(), response.length(), 0);
+    // std::vector<Message>::reverse_iterator it;
+    // for (it = messages.rbegin(); it != messages.rend(); ++it) {
+    //   std::cout << "dentro de for = " << *it << std::endl;
+    //   std::string response = this->execute(client, (*it));
+    //   std::cout << response << std::endl;
+    //   send(socket, response.c_str(), response.length(), 0);
+    // }
+    // // this->registerClient(client);
+  } // else {
+  std::vector<Message>::iterator it;
+  for (it = messages.begin(); it != messages.end(); ++it) {
+    std::cout << "dentro de for = " << *it << std::endl;
+    std::cout << (*it) << std::endl;
+    std::string response = this->execute(client, (*it));
+    std::cout << response << std::endl;
+    send(socket, response.c_str(), response.length(), 0);
     }
-    // this->registerClient(client);
-  } else {
-    std::vector<Message>::iterator it;
-    for (it = messages.begin(); it != messages.end(); ++it) {
-      std::cout << (*it) << std::endl;
-      std::string response = this->execute(client, (*it));
-      std::cout << response << std::endl;
-      send(socket, response.c_str(), response.length(), 0);
-    }
-  }
+  // }
   if (this->informationValid(client) && (messages[0].command == "PASS" || messages[0].command == "NICK" || messages[0].command == "USER")) {
     std::cout << " por aqui voy comd = " << messages[0].command << std::endl;
     this->registerClient(client);
