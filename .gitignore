@@ -3,4 +3,10 @@
 *.log
 tmp/
 
+#Debuf files & vsconde
+*.dSYM/
+.vscode
+
+#Obj files
+*.o
 
