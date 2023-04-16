@@ -30,7 +30,7 @@ void Server::registerClient(Client * client) {
     std::vector<std::string> params;
     params.push_back(client->getNickname());
     client->setRegistered();
-    this->addClient(client);
+    // this->addClient(client);
     std::string welcome = "Welcome to ft_irc " + client->getIdentifier();
     std::string response = generateResponse("ft_irc", "001",  params, welcome);
     send(client->getSocket(), response.c_str(), response.length(), 0);
@@ -326,7 +326,7 @@ std::string Server::execute(Client * client, Message & msg) {
 }
 
 void Server::handleRequest(int socket, char buffer[1024]) {
-  std::cout << buffer << std::endl;
+  std::cout << "buffer = " << buffer << std::endl;
   Client * client;
   client = this->getClientBySocket(socket);
 
@@ -336,13 +336,16 @@ void Server::handleRequest(int socket, char buffer[1024]) {
   std::vector<Message> messages = this->parse(buffer);
   if (client == nullptr) {
     client = new Client(socket);
+    this->addClient(client);
+    std::cout << "client socket = " << socket << std::endl;
     std::vector<Message>::reverse_iterator it;
     for (it = messages.rbegin(); it != messages.rend(); ++it) {
+      std::cout << "dentro de for = " << *it << std::endl;
       std::string response = this->execute(client, (*it));
       std::cout << response << std::endl;
       send(socket, response.c_str(), response.length(), 0);
     }
-    this->registerClient(client);
+    // this->registerClient(client);
   } else {
     std::vector<Message>::iterator it;
     for (it = messages.begin(); it != messages.end(); ++it) {
@@ -351,6 +354,10 @@ void Server::handleRequest(int socket, char buffer[1024]) {
       std::cout << response << std::endl;
       send(socket, response.c_str(), response.length(), 0);
     }
+  }
+  if (this->informationValid(client) && (messages[0].command == "PASS" || messages[0].command == "NICK" || messages[0].command == "USER")) {
+    std::cout << " por aqui voy comd = " << messages[0].command << std::endl;
+    this->registerClient(client);
   }
   std::cout << "Server now has: " << this->_userbase.size() << " users" << std::endl;
 }
