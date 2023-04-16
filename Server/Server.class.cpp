@@ -26,15 +26,15 @@ Server::~Server(void) {return;}
 ///////////////
 
 void Server::registerClient(Client * client) {
-  if (this->informationValid(client)) {
+  if (this->informationValid(client) && client->passwordIsSet() == true) {
     std::vector<std::string> params;
     params.push_back(client->getNickname());
     client->setRegistered();
-    this->addClient(client);
+    // this->addClient(client);
     std::string welcome = "Welcome to ft_irc " + client->getIdentifier();
     std::string response = generateResponse("ft_irc", "001",  params, welcome);
     send(client->getSocket(), response.c_str(), response.length(), 0);
-  } else {
+  } else if (client->passwordIsSet() == false) {
     std::vector<std::string> null_vector(0);
     std::string response = generateResponse("ft_irc", "464", null_vector, "Registration failed");
     send(client->getSocket(), response.c_str(), response.length(), 0);
@@ -96,8 +96,8 @@ bool Server::clientRegistered(int socket) const {
 
 bool Server::informationValid(Client * client) const {
   if (!client->getUsername().empty() && \
-      !client->getNickname().empty() && \
-      client->passwordIsSet() == true) {
+      !client->getNickname().empty()) {
+      // client->passwordIsSet() == true) {
     return (true);
   }
   return (false);
@@ -336,22 +336,18 @@ void Server::handleRequest(int socket, char buffer[1024]) {
   std::vector<Message> messages = this->parse(buffer);
   if (client == nullptr) {
     client = new Client(socket);
-    std::vector<Message>::reverse_iterator it;
-    for (it = messages.rbegin(); it != messages.rend(); ++it) {
-      std::string response = this->execute(client, (*it));
-      std::cout << response << std::endl;
-      send(socket, response.c_str(), response.length(), 0);
-    }
-    this->registerClient(client);
-  } else {
-    std::vector<Message>::iterator it;
-    for (it = messages.begin(); it != messages.end(); ++it) {
-      std::cout << (*it) << std::endl;
-      std::string response = this->execute(client, (*it));
-      std::cout << response << std::endl;
-      send(socket, response.c_str(), response.length(), 0);
-    }
+    this->addClient(client);
   }
+  std::vector<Message>::iterator it;
+  for (it = messages.begin(); it != messages.end(); ++it) {
+    std::cout << (*it) << std::endl;
+    std::string response = this->execute(client, (*it));
+    std::cout << response << std::endl;
+    send(socket, response.c_str(), response.length(), 0);
+    }
+  if (this->informationValid(client) && (messages[0].command == "PASS" || 
+    messages[0].command == "NICK" || messages[0].command == "USER"))
+    this->registerClient(client);
   std::cout << "Server now has: " << this->_userbase.size() << " users" << std::endl;
 }
 
