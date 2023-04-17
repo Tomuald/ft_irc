@@ -341,14 +341,14 @@ void Server::handleRequest(int socket, char buffer[512]) {
     this->addClient(client);
     register_client = true;
   }
-  std::vector<Message>::reverse_iterator it;
-  for (it = messages.rbegin(); it != messages.rend(); ++it) {
+  std::vector<Message>::iterator it;
+  for (it = messages.begin(); it != messages.end(); ++it) {
     std::cout << (*it) << std::endl;
     std::string response = this->execute(client, (*it));
     std::cout << response << std::endl;
     send(socket, response.c_str(), response.length(), 0);
     }
-  if (register_client) {
+  if (informationValid(client) && !client->isRegistered()) {
     this->registerClient(client);
     register_client = false;
   }
