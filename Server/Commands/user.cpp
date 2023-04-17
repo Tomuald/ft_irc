@@ -16,5 +16,5 @@ std::string Server::user(Client * client, Message & msg) {
   for (i = 3; i < msg.params.size(); i++)
     real_name.append(msg.params[i]);
   client->setRealname(real_name);
-  return ("User information set\r\n");
+  return ("\r\n");
 }

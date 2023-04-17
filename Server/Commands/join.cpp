@@ -41,6 +41,9 @@ std::string Server::join(Client * client, Message & msg) {
   params.push_back(channel_name);
   std::string nicknames;
   for (it = clients.begin(); it != clients.end(); ++it) {
+    if ((*it)->isOperator()) {
+      nicknames += "@";
+    }
     nicknames += (*it)->getNickname();
     std::vector<Client *>::iterator next_it = it;
     std::advance(next_it, 1);
