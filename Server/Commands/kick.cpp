@@ -1,11 +1,12 @@
 #include "../Server.class.hpp"
 
 /**
+    * @brief 
+
     Command: KICK
     Parameters: <channel> <user> [<comment>]
 
-    KICK &Melbourne Matthew         ; Kick Matthew from &Melbourne
-
+    Eje:
     KICK #Finnish John :Speaking English
                                 ; Kick John from #Finnish using
                                 "Speaking English" as the reason
@@ -14,9 +15,7 @@
 
 std::string Server::kick(Client * client, Message & msg) {
     std::vector<std::string> params;
-
-    std::cout << "Params = " << msg.params.size() << std::endl;
-    std::cout << "Params_01 = " << msg.params[1] << std::endl;
+    std::string response;
 
     if (msg.params.size() < 2) {
         params.push_back(client->getNickname());
@@ -38,11 +37,11 @@ std::string Server::kick(Client * client, Message & msg) {
         return (generateResponse("ft_irc", "442", params, "User not on that channel"));
     }
 
-    std::cout << "Server had: " << this->_userbase.size() << " users" << std::endl;
+    /**
+    * @brief kick user
+    */
     std::vector<Client *>::iterator it;
     Client *tmp = this->getClientByName(msg.params[1]);
-    if (tmp != nullptr)
-        std::cout << "Client_NICK = " << tmp->getNickname() << std::endl;
     for (it = this->_userbase.begin(); it != this->_userbase.end(); ) {
         if ((*it)->getNickname() == tmp->getNickname()) {
             std::cout << tmp->getNickname() << " user kick !!" << std::endl;
@@ -54,7 +53,17 @@ std::string Server::kick(Client * client, Message & msg) {
             ++it;
         }
     }
-    std::cout << "Server now has: " << this->_userbase.size() << " users" << std::endl;
+
+    // Notify the channel kick user
+    params.push_back("KICK");
+    params.push_back(msg.params[0]);
+    params.push_back(msg.params[1]);
+    response = generateResponse(client->getIdentifier(), "", params, "");
+    Channel *chtmp = this->getChannel(msg.params[0]);
+    std::vector<Client *> clients = chtmp->getClients();
+    for (it = clients.begin(); it != clients.end(); ++it) {
+        send((*it)->getSocket(), response.c_str(), response.length(), 0);
+    }
   
   return ("");
 }

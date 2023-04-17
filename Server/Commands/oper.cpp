@@ -1,7 +1,17 @@
 #include "../Server.class.hpp"
 
+/**
+  * @brief  OPER message is used by a normal user to obtain operator privileges.
+    The combination of <user> and <password> are required to gain
+    Operator privileges.
+
+    Command: OPER
+    Parameters: <user> <password>
+*/
+
 std::string Server::oper(Client * client, Message & msg) {
   std::vector<std::string> params;
+  std::string response;
 
   if (msg.params.size() != 2) {
     // params.clear();
@@ -23,9 +33,18 @@ std::string Server::oper(Client * client, Message & msg) {
   }
   client->setMode("+o");
   client->setNickname("@Oper42");
-  // params.clear();
+  
+ // Notify the channel NEW Oper USER
+  params.push_back("OPER");
   params.push_back(client->getNickname());
   params.push_back(client->getMode());
-  return (generateResponse("ft_irc", "381", params, "You are now an IRC operator"));
 
+  response = generateResponse(client->getIdentifier(), "", params, "");
+  Channel *chtmp = this->getChannel(msg.params[0]);
+  std::vector<Client *> clients = chtmp->getClients();
+  std::vector<Client *>::iterator it;
+  for (it = clients.begin(); it != clients.end(); ++it) {
+      send((*it)->getSocket(), response.c_str(), response.length(), 0);
+  }
+   return (generateResponse("ft_irc", "381", params, "You are now an IRC operator"));
 }
