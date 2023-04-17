@@ -12,6 +12,6 @@ std::string Server::mode(Client * client, Message & msg) {
   }
   client->setMode(msg.params[1]);
   params.push_back(client->getNickname());
-  params.push_back(msg.params[1]);
+  params.push_back(client->getMode());
   return (generateResponse("ft_irc", "221", params, ""));
 }

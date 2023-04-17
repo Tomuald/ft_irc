@@ -14,6 +14,7 @@
 # include <string>
 # include <vector>
 # include <sstream>
+# include <ctime>
 
 # include "../Client/Client.class.hpp"
 # include "../Channel/Channel.class.hpp"
@@ -66,6 +67,8 @@ class Server {
     void handleRequest(int socket, char buffer[1024]);
     std::map<std::string, fctPointer> getFunctionMap(void);
 
+
+
     // Commands (found in ./Commands/*.cpp)
     std::string pass(Client * client, Message & msg);
     std::string nick(Client * client, Message & msg);
@@ -95,7 +98,6 @@ class Server {
     struct kevent _event;
     std::vector<Client *> _userbase;
     std::vector<Channel*> _channels;
-
 };
 
 std::ostream & operator<<(std::ostream & o, Server const & i);

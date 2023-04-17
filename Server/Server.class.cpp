@@ -34,13 +34,13 @@ void Server::registerClient(Client * client) {
     std::string welcome = "Welcome to ft_irc " + client->getIdentifier();
     std::string response = generateResponse("ft_irc", "001",  params, welcome);
     send(client->getSocket(), response.c_str(), response.length(), 0);
-  } else if (client->passwordIsSet() == false) {
+  } else {
     std::vector<std::string> null_vector(0);
     std::string response = generateResponse("ft_irc", "464", null_vector, "Registration failed");
     send(client->getSocket(), response.c_str(), response.length(), 0);
     Message msg;
     this->quit(client, msg);
-    //this->removeClient(client);
+    this->removeClient(client);
   }
   return ;
 }
@@ -261,9 +261,13 @@ void Server::start(void) {
        } else {
         // handle data on client socket
         std::cout << "handling client request" << std::endl;
-        char buffer[1024];
+        char buffer[512];
         int nbytes = recv(events[i].ident, buffer, sizeof(buffer), 0);
-        buffer[nbytes] = '\0';
+        if (nbytes > 512) {
+          buffer[511] = '\0';
+        } else {
+          buffer[nbytes] = '\0';
+        }
         if (nbytes < 0) {
            std::cerr << "Error: Failed to receive data from client socket." << std::endl;
            close(events[i].ident);
@@ -286,7 +290,7 @@ void Server::start(void) {
 // Parsing
 //////////
 
-std::vector<Message> Server::parse(char buffer[1024]) {
+std::vector<Message> Server::parse(char buffer[512]) {
   std::vector<Message> messages;
   std::string input(buffer);
   std::istringstream iss(input);
@@ -325,18 +329,17 @@ std::string Server::execute(Client * client, Message & msg) {
   return (response);
 }
 
-void Server::handleRequest(int socket, char buffer[1024]) {
+void Server::handleRequest(int socket, char buffer[512]) {
   std::cout << "buffer = " << buffer << std::endl;
   Client * client;
-  client = this->getClientBySocket(socket);
+  bool register_client = false;
 
-  // unelegant fix because NICK arrives before USER therefore, missing
-  // fullIdentifier data to process properly on new connect. Gotta
-  // reverse traverse the buffer
+  client = this->getClientBySocket(socket);
   std::vector<Message> messages = this->parse(buffer);
   if (client == nullptr) {
     client = new Client(socket);
     this->addClient(client);
+    register_client = true;
   }
   std::vector<Message>::iterator it;
   for (it = messages.begin(); it != messages.end(); ++it) {
@@ -345,9 +348,10 @@ void Server::handleRequest(int socket, char buffer[1024]) {
     std::cout << response << std::endl;
     send(socket, response.c_str(), response.length(), 0);
     }
-  if (this->informationValid(client) && (messages[0].command == "PASS" || 
-    messages[0].command == "NICK" || messages[0].command == "USER"))
+  if (informationValid(client) && !client->isRegistered()) {
     this->registerClient(client);
+    register_client = false;
+  }
   std::cout << "Server now has: " << this->_userbase.size() << " users" << std::endl;
 }
 
@@ -361,11 +365,12 @@ std::map<std::string, Server::fctPointer> Server::getFunctionMap(void) {
   functionMap.insert(make_pair("JOIN", &Server::join));
   functionMap.insert(make_pair("PRIVMSG", &Server::privmsg));
   functionMap.insert(make_pair("PING", &Server::pong));
-  functionMap.insert(make_pair("WHO", &Server::who));
+  //functionMap.insert(make_pair("WHO", &Server::who));
   functionMap.insert(make_pair("PART", &Server::part));
   functionMap.insert(make_pair("NICK", &Server::nick));
   functionMap.insert(make_pair("MODE", &Server::mode));
   functionMap.insert(make_pair("USER", &Server::user));
+  functionMap.insert(make_pair("userhost", &Server::user));
   functionMap.insert(make_pair("die", &Server::die));
   // operator functions
   functionMap.insert(make_pair("OPER", &Server::oper));

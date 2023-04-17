@@ -77,7 +77,6 @@ bool Client::passwordIsSet(void) const {
   return (true);
 }
 
-
 bool Client::isInChannel(Channel * channel) const {
   std::vector<Channel *>::const_iterator it = this->_channelsJoined.begin();
   while (it != this->_channelsJoined.end()) {
@@ -88,6 +87,13 @@ bool Client::isInChannel(Channel * channel) const {
     }
   }
   return (false);
+}
+
+bool Client::isOperator(void) const {
+  if (this->_mode == "+o") {
+    return (true);
+  }
+  return (this->_operator);
 }
 
 // Setters

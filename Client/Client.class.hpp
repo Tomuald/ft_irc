@@ -29,6 +29,7 @@ public:
   bool isRegistered(void) const;
   bool passwordIsSet(void) const;
   bool isInChannel(Channel * channel) const;
+  bool isOperator(void) const;
 
   // Setters
   void setNickname(std::string nickname);
