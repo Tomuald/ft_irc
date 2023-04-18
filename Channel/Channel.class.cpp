@@ -34,6 +34,10 @@ std::string Channel::getTopic(void) const {
   return (this->_topic);
 }
 
+std::string Channel::getMode(void) const {
+  return (this->_mode);
+}
+
 // Setters
 void Channel::addClient(Client * client) {
   if (!client->isInChannel(this))
@@ -67,6 +71,10 @@ bool Channel::checkClientConnected(Client * client) {
 
 void  Channel::setTopic(std::string topic) {
   this->_topic = topic;
+}
+
+void  Channel::setMode(std::string mode) {
+  this->_mode = mode;
 }
 
 Channel & Channel::operator=(Channel const & rhs) {

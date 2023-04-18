@@ -23,6 +23,7 @@ public:
   Client getClient(std::string name);
   std::vector<Client *> & getClients(void);
   std::string getTopic(void) const;
+  std::string getMode(void) const;
   // Checkers
   //bool channelExists(std::string name) const;
   // Setters
@@ -30,10 +31,12 @@ public:
   bool removeClient(Client * client);
   bool checkClientConnected(Client * client);
   void  setTopic(std::string topic);
+  void  setMode(std::string mode);
   // Utils
 private:
   std::string _name;
   std::string _topic;
+  std::string _mode;
   std::vector<Client *> _clientsConnected;
 };
 

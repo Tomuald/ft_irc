@@ -14,13 +14,11 @@
 */
 
 std::string Server::topic(Client * client, Message & msg) {
-  std::string response;
   std::vector<std::string> params;
 
   if (msg.params.size() == 0) {
     params.push_back("TOPIC");
-    response = generateResponse("ft_irc", "461", params, "Not enough parameters");
-    return (response);
+    return (generateResponse("ft_irc", "461", params, "Not enough parameters"));
   }
   std::string channel_name = msg.params[0];
   Channel * channel = this->getChannel(channel_name);
@@ -34,26 +32,34 @@ std::string Server::topic(Client * client, Message & msg) {
 			return (generateResponse("ft_irc", "331", params, " No topic is set"));
     params.push_back("TOPIC");
     params.push_back(channel_name);
-    response = generateResponse("ft_irc", "332", params, channel->getTopic());
-    // send(client->getSocket(), response.c_str(), response.length(), 0);
-    return (response);
+    return (generateResponse("ft_irc", "332", params, channel->getTopic()));
   }
   if (msg.params.size() == 2) {
     if (client->isOper() == false) {
-    params.push_back("TOPIC");
-    params.push_back(client->getNickname());
-    response = generateResponse("ft_irc", "482", params, "You're not channel operator");
-    return (response);
+      params.push_back("TOPIC");
+      params.push_back(client->getNickname());
+      return (generateResponse("ft_irc", "482", params, "You're not channel operator"));
+    }
+    else if (client->isInChannel(channel) == false) {
+      params.push_back(msg.params[0]);
+      return (generateResponse("ft_irc", "404", params, "Cannot send to channel"));
     }
     else {
-      std::cout << "AQUI TOY chann name = " << channel->getName() << std::endl;
+      std::string response;
+
       channel->setTopic(msg.params[1]);
+      // Notify the channel New TOPIC
       params.push_back("TOPIC");
-      params.push_back(channel->getTopic());
-      params.push_back(client->getNickname());
-      response = generateResponse("ft_irc", "332", params, channel->getTopic());
-      return (response);
+      params.push_back(channel_name);
+      response = generateResponse(client->getIdentifier(), "", params, channel->getTopic());
+      std::vector<Client *>::iterator it;
+      std::vector<Client *> clients = channel->getClients();
+      for (it = clients.begin(); it != clients.end(); ++it)
+        send((*it)->getSocket(), response.c_str(), response.length(), 0);
+      params.clear();
+      params.push_back("TOPIC");
+      return (generateResponse("ft_irc", "332", params, channel->getTopic()));
     }
   }
-  return (response);
+  return ("");
 }
