@@ -19,7 +19,7 @@ std::string Server::oper(Client * client, Message & msg) {
     params.push_back(client->getMode());
     return (generateResponse("ft_irc", "461", params, "Not enough parameters"));
   }
-  if (msg.params[0] != "Oper42") {
+  if (msg.params[0] != "Oper42" || client->getNickname() != "Oper42") {
     // params.clear();
     params.push_back(client->getNickname());
     // params.push_back(client->getMode());
@@ -33,18 +33,11 @@ std::string Server::oper(Client * client, Message & msg) {
   }
   client->setMode("+o");
   client->setNickname("@Oper42");
+  client->setOper();
   
  // Notify the channel NEW Oper USER
   params.push_back("OPER");
   params.push_back(client->getNickname());
   params.push_back(client->getMode());
-
-  response = generateResponse(client->getIdentifier(), "", params, "");
-  Channel *chtmp = this->getChannel(msg.params[0]);
-  std::vector<Client *> clients = chtmp->getClients();
-  std::vector<Client *>::iterator it;
-  for (it = clients.begin(); it != clients.end(); ++it) {
-      send((*it)->getSocket(), response.c_str(), response.length(), 0);
-  }
-   return (generateResponse("ft_irc", "381", params, "You are now an IRC operator"));
+  return (generateResponse("ft_irc", "381", params, "You are now an IRC operator"));
 }

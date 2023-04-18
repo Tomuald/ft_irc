@@ -22,15 +22,18 @@ public:
   std::string getName(void) const;
   Client getClient(std::string name);
   std::vector<Client *> & getClients(void);
+  std::string getTopic(void) const;
   // Checkers
   //bool channelExists(std::string name) const;
   // Setters
   void addClient(Client * client);
   bool removeClient(Client * client);
   bool checkClientConnected(Client * client);
+  void  setTopic(std::string topic);
   // Utils
 private:
   std::string _name;
+  std::string _topic;
   std::vector<Client *> _clientsConnected;
 };
 

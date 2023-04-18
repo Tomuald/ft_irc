@@ -30,6 +30,7 @@ public:
   bool passwordIsSet(void) const;
   bool isInChannel(Channel * channel) const;
   bool isOperator(void) const;
+  bool isOper(void) const;
 
   // Setters
   void setNickname(std::string nickname);
@@ -42,6 +43,8 @@ public:
   void setMode(std::string mode);
   void joinChannel(Channel * channel);
   void quitChannel(Channel * channel);
+  void setOper(void);
+  
 private:
   int _socket;
   std::string _nickname;

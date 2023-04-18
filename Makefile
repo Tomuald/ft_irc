@@ -17,6 +17,7 @@ SRCS	=	Server/Server.class.cpp		\
 			Server/Commands/die.cpp		\
 			Server/Commands/oper.cpp	\
 			Server/Commands/kick.cpp	\
+			Server/Commands/topic.cpp	\
 			response.cpp				\
 
 OBJS	=	${SRCS:.cpp=.o}

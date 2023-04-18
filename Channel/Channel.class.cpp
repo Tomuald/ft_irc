@@ -9,6 +9,7 @@ Channel::Channel(void) {
 Channel::Channel(std::string name) {
   this->_name = name;
   this->_clientsConnected = std::vector<Client *>();
+  this->_topic = "This is a default topic!";
   return ;
 }
 
@@ -27,6 +28,10 @@ std::string Channel::getName(void) const {
 
 std::vector<Client *> & Channel::getClients(void) {
   return (this->_clientsConnected);
+}
+
+std::string Channel::getTopic(void) const {
+  return (this->_topic);
 }
 
 // Setters
@@ -58,6 +63,10 @@ bool Channel::checkClientConnected(Client * client) {
     }
   }
   return (false);
+}
+
+void  Channel::setTopic(std::string topic) {
+  this->_topic = topic;
 }
 
 Channel & Channel::operator=(Channel const & rhs) {

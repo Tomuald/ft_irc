@@ -375,6 +375,7 @@ std::map<std::string, Server::fctPointer> Server::getFunctionMap(void) {
   // operator functions
   functionMap.insert(make_pair("OPER", &Server::oper));
   functionMap.insert(make_pair("KICK", &Server::kick));
+  functionMap.insert(make_pair("TOPIC", &Server::topic));
 
   return (functionMap);
 }

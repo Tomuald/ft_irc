@@ -96,6 +96,12 @@ bool Client::isOperator(void) const {
   return (this->_operator);
 }
 
+bool Client::isOper(void) const {
+  if (this->_operator == true)
+    return (true);
+  return (false);
+}
+
 // Setters
 void Client::setNickname(std::string nickname) {
   if (nickname.empty()) {
@@ -135,6 +141,10 @@ void Client::setPassword(std::string password) {
 
 void Client::setRegistered(void) {
   this->_isRegistered = true;
+}
+
+void Client::setOper(void) {
+  this->_operator = true;
 }
 
 void Client::setIP(std::string ip) {

@@ -31,7 +31,7 @@ std::string Server::join(Client * client, Message & msg) {
   params.clear();
   params.push_back(client->getNickname());
   params.push_back(channel_name);
-  response = generateResponse("ft_irc", "332", params, "This is a default topic!");
+  response = generateResponse("ft_irc", "332", params, channel->getTopic());
   send(client->getSocket(), response.c_str(), response.length(), 0);
 
   // Notify the user of other users in the channel
