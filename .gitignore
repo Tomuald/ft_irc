@@ -10,3 +10,5 @@ tmp/
 #Obj files
 *.o
 
+#Dir Leo
+walkThrough/

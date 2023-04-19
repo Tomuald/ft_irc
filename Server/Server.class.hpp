@@ -60,14 +60,13 @@ class Server {
     void start(void);
 
     // Parsing
-    std::vector<Message> parse(char buffer[1024]);
+    std::vector<Message> parse(std::string input);
+    void handlePartialReq(char buffer[512]);
 
     // Message handling
     std::string execute(Client * client, Message & msg);
-    void handleRequest(int socket, char buffer[1024]);
+    void handleRequest(int socket, std::string buffer);
     std::map<std::string, fctPointer> getFunctionMap(void);
-
-
 
     // Commands (found in ./Commands/*.cpp)
     std::string pass(Client * client, Message & msg);
@@ -92,6 +91,7 @@ class Server {
     struct kevent _event;
     std::vector<Client *> _userbase;
     std::vector<Channel*> _channels;
+    std::string _line;
 };
 
 std::ostream & operator<<(std::ostream & o, Server const & i);
