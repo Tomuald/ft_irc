@@ -263,6 +263,7 @@ void Server::start(void) {
         std::cout << "handling client request" << std::endl;
         char buffer[512];
         int nbytes = recv(events[i].ident, buffer, sizeof(buffer), 0);
+        std::cout << "nbytes = " << nbytes << std::endl;
         if (nbytes > 512) {
           buffer[511] = '\0';
         } else {
@@ -276,9 +277,14 @@ void Server::start(void) {
            // Client has disconnected
            close(events[i].ident);
            continue;
-        } else {
-          this->handleRequest(socket, buffer);
+        } else
+          this->handlePartialReq(buffer);
+        
+        if (this->_line.find('\n') != std::string::npos) {
+          this->handleRequest(socket, this->_line);
+          this->_line.clear();
         }
+
         memset(buffer, 0, sizeof(*buffer));
       }
     }
@@ -290,9 +296,9 @@ void Server::start(void) {
 // Parsing
 //////////
 
-std::vector<Message> Server::parse(char buffer[512]) {
+std::vector<Message> Server::parse(std::string input) {
   std::vector<Message> messages;
-  std::string input(buffer);
+  // std::string input(buffer);
   std::istringstream iss(input);
 
   std::string line;
@@ -301,6 +307,15 @@ std::vector<Message> Server::parse(char buffer[512]) {
     messages.push_back(msg);
   }
   return (messages);
+}
+
+// TO process a command, first aggregate the received packets in order to rebuild LIne
+void Server::handlePartialReq(char buffer[512]) {
+
+  std::string partial_line(buffer);
+
+  this->_line.append(partial_line);
+  std::cout << "_LIne = " << this->_line << std::endl;
 }
 
 ////////////////////
@@ -329,7 +344,7 @@ std::string Server::execute(Client * client, Message & msg) {
   return (response);
 }
 
-void Server::handleRequest(int socket, char buffer[512]) {
+void Server::handleRequest(int socket, std::string buffer) {
   std::cout << "buffer = " << buffer << std::endl;
   Client * client;
   bool register_client = false;
