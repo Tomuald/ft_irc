@@ -247,7 +247,7 @@ void Server::start(void) {
       if (socket == this->_server_socket) {
            // new connection
            std::cout << "registering new connection" << std::endl;
-           int accept_socket = accept(this->_server_socket, (struct sockaddr *) &struct_client, &len);
+           int accept_socket = accept(this->_server_socket, (struct sockaddr *) &struct_client, &len); //leo
            if (accept_socket == -1) {
                std::cerr << strerror(errno) << std::endl;
                continue;
@@ -276,9 +276,15 @@ void Server::start(void) {
            // Client has disconnected
            close(events[i].ident);
            continue;
-        } else {
-          this->handleRequest(socket, buffer);
+        } else
+          this->handlePartialReq(buffer);
+        
+        // if (this->_line.find('\n') != std::string::npos) {
+        if (this->_line[_line.length() - 1] == '\n') {
+          this->handleRequest(socket, this->_line);
+          this->_line.clear();
         }
+
         memset(buffer, 0, sizeof(*buffer));
       }
     }
@@ -290,9 +296,9 @@ void Server::start(void) {
 // Parsing
 //////////
 
-std::vector<Message> Server::parse(char buffer[512]) {
+std::vector<Message> Server::parse(std::string input) {
   std::vector<Message> messages;
-  std::string input(buffer);
+  // std::string input(buffer);
   std::istringstream iss(input);
 
   std::string line;
@@ -301,6 +307,15 @@ std::vector<Message> Server::parse(char buffer[512]) {
     messages.push_back(msg);
   }
   return (messages);
+}
+
+// TO process a command, first aggregate the received packets in order to rebuild LIne
+void Server::handlePartialReq(char buffer[512]) {
+
+  std::string partial_line(buffer);
+
+  this->_line.append(partial_line);
+  // std::cout << "_LIne = " << this->_line << std::endl;
 }
 
 ////////////////////
@@ -329,7 +344,7 @@ std::string Server::execute(Client * client, Message & msg) {
   return (response);
 }
 
-void Server::handleRequest(int socket, char buffer[512]) {
+void Server::handleRequest(int socket, std::string buffer) {
   std::cout << "buffer = " << buffer << std::endl;
   Client * client;
   bool register_client = false;
@@ -357,6 +372,7 @@ void Server::handleRequest(int socket, char buffer[512]) {
 
 // consider building this in your constructors!
 std::map<std::string, Server::fctPointer> Server::getFunctionMap(void) {
+
   std::map<std::string, fctPointer> functionMap;
   // basic functions
   functionMap.insert(make_pair("PASS", &Server::pass));
@@ -364,7 +380,7 @@ std::map<std::string, Server::fctPointer> Server::getFunctionMap(void) {
   functionMap.insert(make_pair("JOIN", &Server::join));
   functionMap.insert(make_pair("PRIVMSG", &Server::privmsg));
   functionMap.insert(make_pair("PING", &Server::pong));
-  //functionMap.insert(make_pair("WHO", &Server::who));
+  // functionMap.insert(make_pair("WHO", &Server::who));
   functionMap.insert(make_pair("PART", &Server::part));
   functionMap.insert(make_pair("NICK", &Server::nick));
   functionMap.insert(make_pair("MODE", &Server::mode));
@@ -372,6 +388,9 @@ std::map<std::string, Server::fctPointer> Server::getFunctionMap(void) {
   functionMap.insert(make_pair("userhost", &Server::user));
   functionMap.insert(make_pair("die", &Server::die));
   // operator functions
+  functionMap.insert(make_pair("OPER", &Server::oper));
+  functionMap.insert(make_pair("KICK", &Server::kick));
+  functionMap.insert(make_pair("TOPIC", &Server::topic));
 
   return (functionMap);
 }

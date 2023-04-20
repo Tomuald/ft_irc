@@ -9,6 +9,7 @@ Channel::Channel(void) {
 Channel::Channel(std::string name) {
   this->_name = name;
   this->_clientsConnected = std::vector<Client *>();
+  this->_topic = "This is a default topic!";
   return ;
 }
 
@@ -29,6 +30,14 @@ std::vector<Client *> & Channel::getClients(void) {
   return (this->_clientsConnected);
 }
 
+std::string Channel::getTopic(void) const {
+  return (this->_topic);
+}
+
+std::string Channel::getMode(void) const {
+  return (this->_mode);
+}
+
 // Setters
 void Channel::addClient(Client * client) {
   if (!client->isInChannel(this))
@@ -46,6 +55,26 @@ bool Channel::removeClient(Client * client) {
     }
   }
   return (false);
+}
+
+bool Channel::checkClientConnected(Client * client) {
+  std::vector<Client *>::iterator it = this->_clientsConnected.begin();
+  while (it != this->_clientsConnected.end()) {
+    if ((*it)->getNickname() == client->getNickname()) {
+      return (true);
+    } else {
+      ++it;
+    }
+  }
+  return (false);
+}
+
+void  Channel::setTopic(std::string topic) {
+  this->_topic = topic;
+}
+
+void  Channel::setMode(std::string mode) {
+  this->_mode = mode;
 }
 
 Channel & Channel::operator=(Channel const & rhs) {

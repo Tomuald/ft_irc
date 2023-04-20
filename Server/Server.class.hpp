@@ -60,14 +60,13 @@ class Server {
     void start(void);
 
     // Parsing
-    std::vector<Message> parse(char buffer[1024]);
+    std::vector<Message> parse(std::string input);
+    void handlePartialReq(char buffer[512]);
 
     // Message handling
     std::string execute(Client * client, Message & msg);
-    void handleRequest(int socket, char buffer[1024]);
+    void handleRequest(int socket, std::string buffer);
     std::map<std::string, fctPointer> getFunctionMap(void);
-
-
 
     // Commands (found in ./Commands/*.cpp)
     std::string pass(Client * client, Message & msg);
@@ -81,17 +80,25 @@ class Server {
     std::string who(Client * client, Message & msg);
     std::string mode(Client * client, Message & msg);
     std::string die(Client * client, Message & msg);
+    
+    //oper
+    std::string oper(Client * client, Message & msg);
+    std::string kick(Client * client, Message & msg);
+    std::string topic(Client * client, Message & msg);
+
 
     // Overloads
     Server & operator=(Server const & rhs);
   private:
     std::string _port;
     std::string _password;
+    std::string _opepass;
     int _server_socket;
     int _kq;
     struct kevent _event;
     std::vector<Client *> _userbase;
     std::vector<Channel*> _channels;
+    std::string _line;
 };
 
 std::ostream & operator<<(std::ostream & o, Server const & i);
