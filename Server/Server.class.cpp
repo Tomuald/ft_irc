@@ -263,7 +263,6 @@ void Server::start(void) {
         std::cout << "handling client request" << std::endl;
         char buffer[512];
         int nbytes = recv(events[i].ident, buffer, sizeof(buffer), 0);
-        std::cout << "nbytes = " << nbytes << std::endl;
         if (nbytes > 512) {
           buffer[511] = '\0';
         } else {
@@ -280,7 +279,8 @@ void Server::start(void) {
         } else
           this->handlePartialReq(buffer);
         
-        if (this->_line.find('\n') != std::string::npos) {
+        // if (this->_line.find('\n') != std::string::npos) {
+        if (this->_line[_line.length() - 1] == '\n') {
           this->handleRequest(socket, this->_line);
           this->_line.clear();
         }
@@ -315,7 +315,7 @@ void Server::handlePartialReq(char buffer[512]) {
   std::string partial_line(buffer);
 
   this->_line.append(partial_line);
-  std::cout << "_LIne = " << this->_line << std::endl;
+  // std::cout << "_LIne = " << this->_line << std::endl;
 }
 
 ////////////////////
