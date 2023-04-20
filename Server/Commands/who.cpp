@@ -2,18 +2,33 @@
 
 std::string Server::who(Client * client, Message & msg) {
   // lists all users that match the given string
-  std::string name = msg.params[0];
-  std::vector<std::string> userlist;
-  std::vector<Client *>::iterator it;
-  for (it = this->_userbase.begin(); it != this->_userbase.end(); ++it) {
-    std::string comp = (*it)->getNickname();
-    if (comp.c_str(), name.c_str(), name.length())
-      userlist.push_back(comp);
+  std::string response;
+  if (this->channelExists(msg.params[0])) {
+    std::vector<std::string> params;
+    Channel * channel = this->getChannel(msg.params[0]);
+    if (!channel) {
+      return ("");
+    }
+    std::vector<Client *>::iterator it;
+    std::vector<Client *> clients = channel->getClients();
+    for (it = clients.begin(); it != clients.end(); ++it) {
+      if ((*it)->getNickname() == client->getNickname()) {
+        continue ;
+      }
+      params.push_back(client->getNickname());
+      params.push_back(channel->getName());
+      params.push_back((*it)->getUsername());
+      params.push_back((*it)->getIP());
+      params.push_back("ft_irc");
+      params.push_back((*it)->getNickname());
+      response = generateResponse("ft_irc", "352", params, (*it)->getFullname());
+      send(client->getSocket(), response.c_str(), response.length(), 0);
+    }
+    // Notify End of /WHO list
+    params.clear();
+    params.push_back(client->getNickname());
+    params.push_back(msg.params[0]);
+    response = generateResponse("ft_irc", "315", params, "End of /WHO list");
   }
-  std::string response = generateResponse("ft_irc", "352", userlist, "");
-  send(client->getSocket(), response.c_str(), response.length(), 0);
-  std::vector<std::string> _names;
-  _names.push_back(userlist.back());
-  response = generateResponse("ft_irc", "315", _names, "End of /WHO list");
   return (response);
 }

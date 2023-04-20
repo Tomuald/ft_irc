@@ -24,6 +24,8 @@ public:
   std::string getIP(void) const;
   std::string getIdentifier(void) const;
   std::string getMode(void) const;
+  std::vector<Channel *> getChannels(void) const;
+  std::string getFullname(void) const;
 
   // Checkers
   bool isRegistered(void) const;

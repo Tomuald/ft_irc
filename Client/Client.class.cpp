@@ -53,6 +53,10 @@ int Client::getSocket(void) const {
   return (this->_socket);
 }
 
+std::string Client::getFullname(void) const {
+  return (this->_realname);
+}
+
 std::string Client::getIdentifier(void) const {
   return (this->_fullIdentifier);
 }
@@ -63,6 +67,10 @@ std::string Client::getIP(void) const {
 
 std::string Client::getMode(void) const {
   return (this->_mode);
+}
+
+std::vector<Channel *> Client::getChannels(void) const {
+  return (this->_channelsJoined);
 }
 
 // Checkers

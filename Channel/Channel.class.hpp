@@ -25,7 +25,7 @@ public:
   std::string getTopic(void) const;
   std::string getMode(void) const;
   // Checkers
-  //bool channelExists(std::string name) const;
+  bool channelExists(std::string name) const;
   // Setters
   void addClient(Client * client);
   bool removeClient(Client * client);
