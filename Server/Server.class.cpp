@@ -364,7 +364,7 @@ std::map<std::string, Server::fctPointer> Server::getFunctionMap(void) {
   functionMap.insert(make_pair("JOIN", &Server::join));
   functionMap.insert(make_pair("PRIVMSG", &Server::privmsg));
   functionMap.insert(make_pair("PING", &Server::pong));
-  //functionMap.insert(make_pair("WHO", &Server::who));
+  // functionMap.insert(make_pair("WHO", &Server::who));
   functionMap.insert(make_pair("PART", &Server::part));
   functionMap.insert(make_pair("NICK", &Server::nick));
   functionMap.insert(make_pair("MODE", &Server::mode));
