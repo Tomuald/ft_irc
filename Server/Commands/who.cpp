@@ -3,11 +3,18 @@
 std::string Server::who(Client * client, Message & msg) {
   // lists all users that match the given string
   std::string response;
+  std::vector<std::string> params;
+  if (msg.params.size() < 1) {
+    params.push_back(msg.command);
+    response = generateResponse("ft_irc", "461", params, "Not enough parameters");
+    return (response);
+  }
   if (this->channelExists(msg.params[0])) {
-    std::vector<std::string> params;
     Channel * channel = this->getChannel(msg.params[0]);
-    if (!channel) {
-      return ("");
+    if (!client->isInChannel(channel)) {
+      params.push_back(channel->getName());
+      response = generateResponse("ft_irc", "442", params, "You're not on that channel");
+      return (response);
     }
     std::vector<Client *>::iterator it;
     std::vector<Client *> clients = channel->getClients();
@@ -29,6 +36,10 @@ std::string Server::who(Client * client, Message & msg) {
     params.push_back(client->getNickname());
     params.push_back(msg.params[0]);
     response = generateResponse("ft_irc", "315", params, "End of /WHO list");
+  } else {
+    params.push_back(msg.params[0]);
+    response = generateResponse("ft_irc", "403", params, "No such channel");
+    return (response);
   }
   return (response);
 }

@@ -4,7 +4,7 @@ std::string Server::join(Client * client, Message & msg) {
   std::string response;
   std::vector<std::string> params;
 
-  if (msg.params.size() == 0) {
+  if (msg.params.size() == 0 || (msg.params[0].length() == 1 && msg.params[0][0] == '#')) {
     params.push_back("JOIN");
     response = generateResponse("ft_irc", "461", params, "Not enough parameters");
     return (response);
