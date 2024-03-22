@@ -3,15 +3,14 @@
 </h1>
 
 <p align="center">
-	<img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/Tomuald/ft_irc?color=lightblue" />
-	<img alt="Number of lines of code" src="https://img.shields.io/tokei/lines/github/Tomuald/ft_irc?color=critical" />
+	<img alt="GitHub repo size" src="https://img.shields.io/github/repo-size/Tomuald/ft_irc?style=plastic&logo=linux&logoColor=yellow">
 	<img alt="Code language count" src="https://img.shields.io/github/languages/count/Tomuald/ft_irc?color=yellow" />
 	<img alt="GitHub top language" src="https://img.shields.io/github/languages/top/Tomuald/ft_irc?color=blue" />
-	<img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/Tomuald/ft_irc?color=green" />
+	<img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/Tomuald/ft_irc?color=yellow" />
 </p>
 
 <p> Internet is ruled by solid standards protocols that allow connected computers to interact
-with each other. It’s always a good thing to know.
+		with each other. It’s always a good thing to know.
 </p>
 
 ## 💡 About the project
@@ -53,9 +52,9 @@ with each other. It’s always a good thing to know.
 | NICK     | To assign a nickname to the user or change an existing one.|
 | USER     | used at the beginning of connection to specify the username, hostname and realname of a new user    |
 | JOIN     | used by a user to request to start listening to the specific channel.          |
-| PRIVMSG  |  |
-| KICK     |                |
-| PART     |                |
+| PRIVMSG  | Sends <message> to <msgtarget>, which is usually a user or channel |
+| KICK     | Used to kick a user from a channel with an optional message               |
+| PART     | command logs you off and disconnects you from a channel                |
 | QUIT     | A client session is terminated with a quit message.              |
 
 ## 🛠️ Team
