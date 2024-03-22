@@ -56,6 +56,12 @@
 | KICK     | Used to kick a user from a channel with an optional message               |
 | PART     | command logs you off and disconnects you from a channel                |
 | QUIT     | A client session is terminated with a quit message.              |
+| DIE     | Instructs the server to shut down. This command may only be issued by IRC server operators.              |
+| MODE     | The MODE command is dual-purpose. It can be used to set both user and channel modes.             |
+| OPER     |  Authenticates a user as an IRC operator on that server.            |
+| PONG     |  This command is a reply to the PING command and works in much the same way.            |
+| TOPIC     | Allows the client to query or set the channel topic on <channel>.             |
+| WHO     | Returns a list of users who match <name>             |
 
 ## 🛠️ Team
 
